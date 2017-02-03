@@ -2,7 +2,7 @@ import argparse
 import sys
 import os
 import json
-import smtplib
+from smtplib import SMTP as SMTP
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
@@ -133,11 +133,10 @@ else:
     msg["Subject"] = subject
     msg.attach(MIMEText(message))
     mailserver = None
-    if enable_ssl:
-        mailserver = smtplib.SMTP_SSL(config["smtp_url"], port)
-    else:
-        mailserver = smtplib.SMTP(config["smtp_url"], port)
+    mailserver = SMTP(config["smtp_url"], port)
     mailserver.ehlo()
+    if enable_ssl:
+        mailserver.starttls()
     mailserver.login(config["smtp_login"], config["smtp_password"])
     mailserver.sendmail(config["from"], config["to"], msg.as_string())
     mailserver.quit()
